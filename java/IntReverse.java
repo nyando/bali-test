@@ -11,7 +11,7 @@ public class IntReverse {
     }
 
     public static void main(String[] args) {
-        System.out.println(reverse(123456));
+        reverse(123456);
     }
 
 }

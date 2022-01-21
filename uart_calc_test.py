@@ -8,13 +8,13 @@ ser = serial.Serial(port='COM4',
             bytesize=serial.EIGHTBITS,
             timeout=1)
 
-IINC, IADD, ISUB, IAND, IOR, IXOR, INEG, ISHL, ISHR = 0b0000, 0b0001, 0b0010, 0b0110, 0b0111, 0b01000, 0b1001, 0b1010, 0b1011
+IADD, ISUB, INEG, ISHL, ISHR, IAND, IOR, IXOR, IINC = 0b0000, 0b0001, 0b0101, 0b1100, 0b1101, 0b1111, 0b1000, 0b1001, 0b1010
 
 ser.isOpen()
 
 a  = 0xd3ad_b33f
 b  = 0xc4fe_b4b3
-ops = [IINC, IADD, ISUB, IAND, IOR, IXOR, INEG, ISHL, ISHR]
+ops = [IADD, ISUB, INEG, ISHL, ISHR, IAND, IOR, IXOR, IINC]
 
 for op in ops:
     ser.write(a.to_bytes(4, 'little'))
