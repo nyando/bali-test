@@ -78,7 +78,7 @@ OPCODES = {
     0xbc: 'newarray'
 }
 
-OPCODE_ARGCOUNT = {
+OPCODE_ARG_COUNT = {
     0x00: 0,
     0x01: 0,
     0x02: 0,
@@ -158,82 +158,103 @@ OPCODE_ARGCOUNT = {
     0xbc: 1
 }
 
+
+class MethodCode:
+    def __init__(self, name, max_stack, max_local, code_segment):
+        self.name = name
+        self.max_stack = max_stack
+        self.max_local = max_local
+        self.code = code_segment
+
+    def get_name(self):
+        return self.name
+
+    def get_stack(self):
+        return self.max_stack
+
+    def get_local(self):
+        return self.max_local
+
+    def get_code(self):
+        return self.code
+
+
 class ClassFile:
-    classfile = None
+    class_file = None
     magic = 0
     minor = 0
     major = 0
-    constpoolcount = 0
-    constpool = []
+    const_count = 0
+    const_pool = []
     utf8_consts = {}
     access = 0
     this = 0
     superclass = 0
-    ifacecount = 0
-    ifaces = []
-    fieldcount = 0
+    interface_count = 0
+    interfaces = []
+    field_count = 0
     fields = []
-    methodcount = 0
+    method_count = 0
     methods = []
-    attribcount = 0
+    attr_count = 0
     attribs = []
-    codesegs = []
+    code_segments = []
 
     def __init__(self, filename):
         with open(filename, 'rb') as file:
-            self.classfile = file
-            self.parse_classfile()
+            self.class_file = file
+            self.parse_class_file()
 
     def _read_u4(self):
-        return int.from_bytes(self.classfile.read(4), byteorder='big')
+        return int.from_bytes(self.class_file.read(4), byteorder='big')
 
     def _read_u2(self):
-        return int.from_bytes(self.classfile.read(2), byteorder='big')
+        return int.from_bytes(self.class_file.read(2), byteorder='big')
 
-    def parse_classfile(self):
+    def parse_class_file(self):
         self.magic = self._read_u4()
         self.minor = self._read_u2()
         self.major = self._read_u2()
-        self.parse_cpinfo()
-        for index, value in enumerate(self.constpool):
+        self.parse_const_pool()
+        for index, value in enumerate(self.const_pool):
             if value[0] == 'UTF8':
                 self.utf8_consts[index + 1] = value[2].decode('UTF-8')
         self.access = self._read_u2()
         self.superclass = self._read_u2()
-        self.ifacecount = self._read_u2()
-        for _ in range(0, self.ifacecount):
-            self.ifaces.append(self._read_u2())
-        self.fieldcount = self._read_u2()
-        for _ in range(0, self.fieldcount):
+        self.interface_count = self._read_u2()
+        for _ in range(0, self.interface_count):
+            self.interfaces.append(self._read_u2())
+        self.field_count = self._read_u2()
+        for _ in range(0, self.field_count):
             self.fields.append(self.parse_info())
-        self.methodcount = self._read_u2()
-        for _ in range(0, self.methodcount):
+        self.method_count = self._read_u2()
+        for _ in range(0, self.method_count):
             self.methods.append(self.parse_info())
-        self.attribcount = self._read_u2()
-        for _ in range(0, self.attribcount):
-            self.attribs.append(self.parse_attribute_info())
+        self.attr_count = self._read_u2()
+        for _ in range(0, self.attr_count):
+            self.attribs.append(self.parse_attribute_info(''))
 
-    def parse_cpinfo(self):
-        self.constpoolcount = self._read_u2()
-        for _ in range(0, self.constpoolcount - 1):
-            self.parse_constpool_info()
+    def parse_const_pool(self):
+        self.const_count = self._read_u2()
+        for _ in range(0, self.const_count - 1):
+            self.parse_const_pool_info()
 
-    def parse_constpool_info(self):
-        tag = self.classfile.read(1)
+    def parse_const_pool_info(self):
+        tag = self.class_file.read(1)
         if tag == b'\x07':    # class tag
-            self.constpool.append(('CLASS', self._read_u2()))
+            self.const_pool.append(('CLASS', self._read_u2()))
         elif tag == b'\x0a':  # method ref
-            self.constpool.append(('METHOD', self._read_u2(), self._read_u2()))
+            self.const_pool.append(('METHOD', self._read_u2(), self._read_u2()))
         elif tag == b'\x03':  # integer ref
-            self.constpool.append(('INT', self._read_u4()))
+            self.const_pool.append(('INT', self._read_u4()))
         elif tag == b'\x0c':  # NameAndType ref
-            self.constpool.append(('NAMEANDTYPE', self._read_u2(), self._read_u2()))
+            self.const_pool.append(('NAMEANDTYPE', self._read_u2(), self._read_u2()))
         elif tag == b'\x01':  # utf8 ref
-            self.constpool.append(self.parse_utf8_ref())
+            self.const_pool.append(self.parse_utf8_ref())
 
     def parse_utf8_ref(self):
         length = self._read_u2()
-        return 'UTF8', length, bytes(self.classfile.read(length))
+        return 'UTF8', length, bytes(self.class_file.read(length))
 
     def parse_info(self):
         access_flags = self._read_u2()
@@ -241,50 +262,66 @@ class ClassFile:
         descriptor_index = self._read_u2()
         attr_count = self._read_u2()
         attributes = []
+        name = ''
+        if name_index in self.utf8_consts:
+            name = self.utf8_consts[name_index]
         for _ in range(0, attr_count):
-            attributes.append(self.parse_attribute_info())
+            attributes.append(self.parse_attribute_info(name))
         return access_flags, name_index, descriptor_index, attr_count, attributes
 
-    def parse_attribute_info(self):
+    def parse_attribute_info(self, name):
         attr_name_index = self._read_u2()
         attr_length = self._read_u4()
         if attr_name_index in self.utf8_consts and self.utf8_consts[attr_name_index] == 'Code':
-            return self.parse_code_segment()
+            return self.parse_code_segment(name)
         else:
-            return attr_name_index, attr_length, bytes(self.classfile.read(attr_length))
+            return attr_name_index, attr_length, bytes(self.class_file.read(attr_length))
 
-    def parse_code_segment(self):
+    def parse_code_segment(self, name):
         max_stack = self._read_u2()
         max_locals = self._read_u2()
-        codelen = self._read_u4()
-        code = bytes(self.classfile.read(codelen))
-        self.codesegs.append(code)
+        code_len = self._read_u4()
+        code = bytes(self.class_file.read(code_len))
+        self.code_segments.append(MethodCode(name, max_stack, max_locals, code))
         exception_table_len = self._read_u2()
         exception_table = []
         for _ in range(exception_table_len):
             exception_table.append((self._read_u2(), self._read_u2(), self._read_u2(), self._read_u2()))
         attr_count = self._read_u2()
         for _ in range(attr_count):
-            self.parse_attribute_info()
+            self.parse_attribute_info(name)
 
     def get_methods(self):
-        return self.codesegs
+        return self.code_segments
 
 
-cf = ClassFile('java/IntReverse.class')
-for i, const in (enumerate(cf.constpool)):
-    print(str(i + 1) + ': ' + str(const))
+class ClassOutput:
+    def __init__(self, class_file):
+        self.class_file = class_file
 
-for attr in cf.fields:
-    print(str(attr))
+    def print_const_pool(self):
+        for const_index, const in (enumerate(self.class_file.const_pool)):
+            print(str(const_index + 1) + ': ' + str(const))
 
-for codeseg in cf.get_methods():
-    i = 0
-    while i < len(codeseg):
-        if codeseg[i] in OPCODES:
-            argc = OPCODE_ARGCOUNT[codeseg[i]]
-            print(str(i) + ': ' + OPCODES[codeseg[i]] + str([codeseg[i + j] for j in range(1, argc + 1)]))
-            i += argc + 1
-        else:
-            print(str(codeseg[i]) + ' is not a valid opcode')
-            i += 1
+    def print_methods(self):
+        for method in self.class_file.get_methods():
+            print(method.get_name())
+            print(method.get_stack())
+            print(method.get_local())
+            code = method.get_code()
+
+            i = 0
+            while i < len(code):
+                if code[i] in OPCODES:
+                    argc = OPCODE_ARG_COUNT[code[i]]
+                    print(str(i) + ': ' + OPCODES[code[i]] + str([code[i + j] for j in range(1, argc + 1)]))
+                    i += argc + 1
+                else:
+                    print(str(code[i]) + ' is not a valid opcode')
+                    i += 1
+
+
+cf = ClassFile('java/RecursiveMath.class')
+out = ClassOutput(cf)
+out.print_const_pool()
+out.print_methods()
