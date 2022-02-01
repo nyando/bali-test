@@ -255,7 +255,9 @@ class ClassFile:
 
     def parse_code_segment(self):
         max_stack = self._read_u2()
+        print('max stack depth: ' + str(max_stack))
         max_locals = self._read_u2()
+        print('local vars: ' + str(max_locals))
         codelen = self._read_u4()
         code = bytes(self.classfile.read(codelen))
         self.codesegs.append(code)
@@ -271,7 +273,7 @@ class ClassFile:
         return self.codesegs
 
 
-cf = ClassFile('java/IntReverse.class')
+cf = ClassFile('java/RecursiveMath.class')
 for i, const in (enumerate(cf.constpool)):
     print(str(i + 1) + ': ' + str(const))
 
