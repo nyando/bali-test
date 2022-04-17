@@ -1,0 +1,20 @@
+public class IntReverse {
+
+    public static int reverse(int reverseMe) {
+        int acc = 0;
+        while (reverseMe != 0) {
+            acc *= 10;
+            acc += reverseMe % 10;
+            reverseMe /= 10;
+        }
+        return acc;
+    }
+
+    public static void main(String[] args) {
+        long start = System.nanoTime();
+        reverse($REVERSE_INPUT$);
+        long stop = System.nanoTime();
+        System.out.println(stop - start);
+    }
+
+}
