@@ -11,7 +11,7 @@ public class IntReverse {
     }
 
     public static void main(String[] args) {
-        reverse(12345);
+        reverse($REVERSE_INPUT$);
     }
 
 }

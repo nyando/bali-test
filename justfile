@@ -1,9 +1,9 @@
 BAKE_DIR := "../bake"
 
 clean:
-    rm -f ./java/*.class
-    rm -f ./java/*.bali.out
-    rm -f ./java/*.mem
+    @rm -f ./java/*.class
+    @rm -f ./java/*.bali.out
+    @rm -f ./java/*.mem
 
 localupdate:
     cd {{BAKE_DIR}} && cargo build --release
@@ -16,17 +16,26 @@ netupdate:
     if {{os()}} == "linux"; then cp bake/target/release/bake .; fi
     rm -rf bake
 
-compile: clean
-    for file in `echo $(find ./java -name "*.java")`; do javac $file; done
+compileall: clean
+    @for file in `echo $(find ./java -name "*.java")`; do javac $file; done
 
-binary: compile
-    for file in `echo $(find ./java -name "*.class")`; do ./bake.exe binary --classfile $file; done
+binaryall: compileall
+    @for file in `echo $(find ./java -name "*.class")`; do ./bake.exe binary --classfile $file; done
 
-testbin PROGRAM: binary
-    ./bake.exe serial --bin ./java/{{PROGRAM}}.bali.out --device COM5
+testfileall: compileall
+    @for file in `echo $(find ./java -name "*.class")`; do ./bake.exe testfile --classfile $file; done
 
-testfile: compile
-    for file in `echo $(find ./java -name "*.class")`; do ./bake.exe testfile --classfile $file; done
+compile PROGRAM: clean
+    @javac ./java/{{PROGRAM}}.java
 
-testupdate TEST_DIR: testfile
-    for file in `echo $(find ./java -name "*.mem")`; do cp $file {{TEST_DIR}}; done
+binary PROGRAM:
+    @just compile {{PROGRAM}}
+    @./bake.exe binary --classfile ./java/{{PROGRAM}}.class
+
+testbin PROGRAM:
+    @just binary {{PROGRAM}}
+    @./bake.exe serial --bin ./java/{{PROGRAM}}.bali.out --device COM5
+
+testfile PROGRAM:
+    @just compile {{PROGRAM}}
+    @./bake.exe testfile --classfile ./java/{{PROGRAM}}.class

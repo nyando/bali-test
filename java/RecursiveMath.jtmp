@@ -17,7 +17,7 @@ public class RecursiveMath {
     }
 
     public static void main(String[] args) {
-        multiply(3, 3);
+        multiply($MATH_OP_1$, $MATH_OP_2$);
     }
 
 

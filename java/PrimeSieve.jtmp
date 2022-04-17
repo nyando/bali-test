@@ -15,7 +15,7 @@ public class PrimeSieve {
     }
 
     public static void main(String[] args) {
-        int max = 10;
+        int max = $SIEVE_INPUT$;
         boolean[] primes = new boolean[max + 1];
         sieve(primes, max);
     }
