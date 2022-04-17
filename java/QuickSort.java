@@ -30,11 +30,7 @@ public class QuickSort {
 
     public static void main(String[] args) {
         int[] sortMe = new int[]{9, 4, 3, 2, 7, 6, 1, 8};
-
-        quickSort(sortMe, 0, sortMe.length - 1);
-
-        //System.out.println("array sorted");
-        //System.out.println(Arrays.toString(sortMe));
+        quickSort(sortMe, 0, 7);
     }
 
 }

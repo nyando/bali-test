@@ -17,12 +17,7 @@ public class RecursiveMath {
     }
 
     public static void main(String[] args) {
-        multiply(2, 3);
-        multiply(3, 2);
-        multiply(0, 3);
-        multiply(3, 0);
-        multiply(1, 3);
-        multiply(3, 1);
+        multiply(3, 3);
     }
 
 

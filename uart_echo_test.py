@@ -1,7 +1,7 @@
 import serial
 import time
 
-ser = serial.Serial(port='COM4',
+ser = serial.Serial(port='COM5',
             baudrate=9600,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,

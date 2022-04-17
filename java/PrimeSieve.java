@@ -15,15 +15,9 @@ public class PrimeSieve {
     }
 
     public static void main(String[] args) {
-        int max = 2_000_000_000;
+        int max = 10;
         boolean[] primes = new boolean[max + 1];
         sieve(primes, max);
-
-        for (int i = 0; i <= max; i++) {
-            if (primes[i]) {
-                System.out.println(i);
-            }
-        }
     }
 
 }

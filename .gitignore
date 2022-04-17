@@ -1,3 +1,5 @@
-.idea/
 venv/
+*.bali.out
 *.class
+*.mem
+*.exe
