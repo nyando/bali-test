@@ -34,7 +34,7 @@ binary PROGRAM:
 
 testbin PROGRAM:
     @just binary {{PROGRAM}}
-    @./bake.exe serial --bin ./java/{{PROGRAM}}.bali.out --device COM5
+    @./bake.exe serial --bin ./java/{{PROGRAM}}.bali.out --device COM5 --long
 
 testfile PROGRAM:
     @just compile {{PROGRAM}}

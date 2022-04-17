@@ -1,5 +1,7 @@
+__pycache__/
 venv/
 *.bali.out
 *.class
 *.mem
 *.exe
+*.java
