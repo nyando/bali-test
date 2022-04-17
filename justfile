@@ -22,6 +22,9 @@ compile: clean
 binary: compile
     for file in `echo $(find ./java -name "*.class")`; do ./bake.exe binary --classfile $file; done
 
+testbin PROGRAM: binary
+    ./bake.exe serial --bin ./java/{{PROGRAM}}.bali.out --device COM5
+
 testfile: compile
     for file in `echo $(find ./java -name "*.class")`; do ./bake.exe testfile --classfile $file; done
 
