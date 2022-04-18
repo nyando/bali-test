@@ -22,7 +22,7 @@ def get_jvm_exectime(prog, paramset):
     
     writejava(outpath, generate(templatepath, paramset))
 
-    proc = subprocess.Popen(['java', '-Xint', './javasw/{}.java'.format(prog)], stdout=subprocess.PIPE, text=True)
+    proc = subprocess.Popen(['java', '-Xint', '-XX:-TieredCompilation', './javasw/{}.java'.format(prog)], stdout=subprocess.PIPE, text=True)
 
     try:
         out, _ = proc.communicate(timeout=30)
@@ -61,10 +61,12 @@ def qsort_jvmtime(i):
     return get_jvm_exectime('QuickSort', { '$QSORT_INPUT_ARRAY$': gen_random_array(i), '$QSORT_INPUT_LEN$': str(i - 1) })
 
 
+random.seed(1)
+
 intrev = [1, 12, 123, 1234, 12345]
 sieve = [10, 20, 50, 100, 150, 200]
-towers = [1, 2, 3, 4, 5, 6, 7]
-recursive = [1, 2, 3, 4, 5, 6, 7]
+towers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+recursive = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 qsort = [10, 20, 50, 100, 150, 200]
 
 csvoutput = []

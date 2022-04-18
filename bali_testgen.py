@@ -61,10 +61,12 @@ def qsort_exectime(i):
     return get_fpga_exectime('QuickSort', { '$QSORT_INPUT_ARRAY$': gen_random_array(i), '$QSORT_INPUT_LEN$': str(i - 1) })
 
 
+random.seed(1)
+
 intrev = [1, 12, 123, 1234, 12345]
 sieve = [10, 20, 50, 100, 150, 200]
-towers = [1, 2, 3, 4, 5, 6, 7]
-recursive = [1, 2, 3, 4, 5, 6, 7]
+towers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+recursive = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 qsort = [10, 20, 50, 100, 150, 200]
 
 csvoutput = []
