@@ -18,7 +18,9 @@ public class RecursiveMath {
 
     public static void main(String[] args) {
         long start = System.nanoTime();
-        multiply($MATH_OP_1$, $MATH_OP_2$);
+        for (int i = 0; i < $LOOPCOUNT$; i++) {
+            multiply($MATH_OP_1$, $MATH_OP_2$);
+        }
         long stop = System.nanoTime();
         System.out.println(stop - start);
     }

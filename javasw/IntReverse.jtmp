@@ -12,7 +12,9 @@ public class IntReverse {
 
     public static void main(String[] args) {
         long start = System.nanoTime();
-        reverse($REVERSE_INPUT$);
+        for (int i = 0; i < $LOOPCOUNT$; i++) {
+            reverse($REVERSE_INPUT$);
+        }
         long stop = System.nanoTime();
         System.out.println(stop - start);
     }
