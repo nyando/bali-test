@@ -69,7 +69,7 @@ def qsort_jvmtime(i):
 
 
 def test_jvmtime():
-    return get_jvm_exectime('Test', { })
+    return get_jvm_exectime('BaselineTest', { })
 
 
 random.seed(1)
