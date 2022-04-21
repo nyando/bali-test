@@ -11,9 +11,11 @@ public class IntReverse {
     }
 
     public static void main(String[] args) {
+        /* NANOTIME START */
         for (int i = 0; i < $LOOPCOUNT$; i++) {
             reverse($REVERSE_INPUT$);
         }
+        /* NANOTIME STOP */
     }
 
 }
