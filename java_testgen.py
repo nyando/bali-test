@@ -25,9 +25,9 @@ def get_jvm_exectime(prog, paramset):
     templatepath = './javasw/{}.jtmp'.format(prog)
     outpath = './javasw/{}.java'.format(prog)
 
-    compilejava(outpath)
-    
     writejava(outpath, generate(templatepath, paramset))
+    
+    compilejava(outpath)
 
     os.chdir('./javasw')
 
@@ -75,6 +75,7 @@ def recursive_jvmtime(i):
 def qsort_jvmtime(i):
     return get_jvm_exectime('QuickSort', { '$QSORT_INPUT_ARRAY$': gen_random_array(i), '$QSORT_INPUT_LEN$': str(i - 1), '$LOOPCOUNT$': '2000' })
 
+
 def test_jvmtime():
     return get_jvm_exectime('Test', { })
 
@@ -90,18 +91,25 @@ qsort = [10, 20, 50, 100]
 csvoutput = []
 csvoutput.append('program;input;exectime\n')
 
-for i in intrev:
-    csvoutput.append('{};{};{}\n'.format('IntReverse', i, intrev_jvmtime(i)))
-for i in sieve:
-    csvoutput.append('{};{};{}\n'.format('PrimeSieve', i, sieve_jvmtime(i)))
-for i in towers:
-    csvoutput.append('{};{};{}\n'.format('TowersOfHanoi', i, towers_jvmtime(i)))
-for i in recursive:
-    csvoutput.append('{};{};{}\n'.format('RecursiveMath', i, recursive_jvmtime(i)))
-for i in qsort:
-    csvoutput.append('{};{};{}\n'.format('QuickSort', i, qsort_jvmtime(i)))
+baseline = test_jvmtime()
 
-csvoutput.append('{};{};{}\n'.format('Test', 0, test_jvmtime()))
+for i in intrev:
+    csvoutput.append('{};{};{}\n'.format('IntReverse', i, intrev_jvmtime(i) - baseline))
+    test_jvmtime()
+for i in sieve:
+    csvoutput.append('{};{};{}\n'.format('PrimeSieve', i, sieve_jvmtime(i) - baseline))
+    test_jvmtime()
+for i in towers:
+    csvoutput.append('{};{};{}\n'.format('TowersOfHanoi', i, towers_jvmtime(i) - baseline))
+    test_jvmtime()
+for i in recursive:
+    csvoutput.append('{};{};{}\n'.format('RecursiveMath', i, recursive_jvmtime(i) - baseline))
+    test_jvmtime()
+for i in qsort:
+    csvoutput.append('{};{};{}\n'.format('QuickSort', i, qsort_jvmtime(i) - baseline))
+    test_jvmtime()
+
+csvoutput.append('{};{};{}\n'.format('Test', 0, baseline))
 
 with open('jvmexectime.csv', 'w') as csvout:
     csvout.writelines(csvoutput)
