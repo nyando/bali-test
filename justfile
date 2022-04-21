@@ -4,6 +4,7 @@ clean:
     @rm -f ./java/*.class
     @rm -f ./java/*.bali.out
     @rm -f ./java/*.mem
+    @rm -f ./java/*.java
 
 localupdate:
     cd {{BAKE_DIR}} && cargo build --release
