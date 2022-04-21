@@ -3,21 +3,24 @@ import random
 import os
 
 
-def generate(inpath, paramset):
+def generate(inpath, paramset, nanotime=False):
     content = ''
     with open(inpath, 'r') as inputfile:
         content = inputfile.read()
         for k, v in paramset.items():
             content = content.replace(k, v)
+        if nanotime:
+            content = content.replace('/* NANOTIME START */', 'long start = System.nanoTime();')
+            content = content.replace('/* NANOTIME STOP */', 'long stop = System.nanoTime(); System.out.println(stop - start);')
     return content
 
 
-def get_jvm_exectime(prog, paramset):
+def get_jvm_exectime(prog, paramset, nanotime=False):
     templatepath = './java/{}.jtmp'.format(prog)
     outpath = './java/{}.java'.format(prog)
 
     with open(outpath, 'w') as outputfile:
-        outputfile.write(generate(templatepath, paramset))
+        outputfile.write(generate(templatepath, paramset, nanotime))
     
     os.system('javac {}'.format(outpath))
 
@@ -25,10 +28,13 @@ def get_jvm_exectime(prog, paramset):
 
     timelist = []
     for _ in range(100):
-        proc = subprocess.run(['perf', 'stat', '--event=cycles', 'java', '-Xint', prog], capture_output=True)
-        cycles = parse_cycles(proc.stderr.decode('utf-8'))
-        print(cycles)
-        timelist.append(cycles)
+        if nanotime:
+            proc = subprocess.run(['java', '-Xint', prog], capture_output=True)
+            metric = int(proc.stdout.decode('utf-8'))
+        else:
+            proc = subprocess.run(['perf', 'stat', '--event=cycles', 'java', '-Xint', prog], capture_output=True)
+            cycles = parse_cycles(proc.stderr.decode('utf-8'))
+        timelist.append(metric)
 
     os.chdir('..')
 
@@ -99,5 +105,5 @@ for j in [1000, 2000, 3000, 4000, 5000]:
 
 csvoutput.append('{};{};{}\n'.format('Test', 0, baseline))
 
-with open('jvmexectime.csv', 'w') as csvout:
+with open('jvmnanoexectime.csv', 'w') as csvout:
     csvout.writelines(csvoutput)
