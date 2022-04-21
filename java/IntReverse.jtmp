@@ -11,7 +11,9 @@ public class IntReverse {
     }
 
     public static void main(String[] args) {
-        reverse($REVERSE_INPUT$);
+        for (int i = 0; i < $LOOPCOUNT$; i++) {
+            reverse($REVERSE_INPUT$);
+        }
     }
 
 }

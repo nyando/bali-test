@@ -9,8 +9,10 @@ public class TowersOfHanoi {
     }
     
     public static void main(String[] args) {
-        int n = $TOWERS_INPUT$;
-        towerOfHanoi(n, 'A', 'C', 'B');
+        for (int i = 0; i < $LOOPCOUNT$; i++) {
+            int n = $TOWERS_INPUT$;
+            towerOfHanoi(n, 'A', 'C', 'B');
+        }
     }
 
 }

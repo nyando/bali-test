@@ -12,24 +12,16 @@ def generate(inpath, paramset):
     return content
 
 
-def writejava(outpath, content):
+def get_jvm_exectime(prog, paramset):
+    templatepath = './java/{}.jtmp'.format(prog)
+    outpath = './java/{}.java'.format(prog)
+
     with open(outpath, 'w') as outputfile:
-        outputfile.write(content)
-
-
-def compilejava(outpath):
+        outputfile.write(generate(templatepath, paramset))
+    
     os.system('javac {}'.format(outpath))
 
-
-def get_jvm_exectime(prog, paramset):
-    templatepath = './javasw/{}.jtmp'.format(prog)
-    outpath = './javasw/{}.java'.format(prog)
-
-    writejava(outpath, generate(templatepath, paramset))
-    
-    compilejava(outpath)
-
-    os.chdir('./javasw')
+    os.chdir('./java')
 
     timelist = []
     for _ in range(100):
@@ -56,28 +48,28 @@ def gen_random_array(length):
     return arrstring
 
 
-def intrev_jvmtime(i):
-    return get_jvm_exectime('IntReverse', { '$REVERSE_INPUT$': str(i), '$LOOPCOUNT$': '2000' })
+def intrev_jvmtime(i, j):
+    return get_jvm_exectime('IntReverse', { '$REVERSE_INPUT$': str(i), '$LOOPCOUNT$': str(j) })
 
 
-def sieve_jvmtime(i):
-    return get_jvm_exectime('PrimeSieve', { '$SIEVE_INPUT$': str(i), '$LOOPCOUNT$': '2000' })
+def sieve_jvmtime(i, j):
+    return get_jvm_exectime('PrimeSieve', { '$SIEVE_INPUT$': str(i), '$LOOPCOUNT$': str(j) })
 
 
-def towers_jvmtime(i):
-    return get_jvm_exectime('TowersOfHanoi', { '$TOWERS_INPUT$': str(i), '$LOOPCOUNT$': '2000' })
+def towers_jvmtime(i, j):
+    return get_jvm_exectime('TowersOfHanoi', { '$TOWERS_INPUT$': str(i), '$LOOPCOUNT$': str(j) })
 
 
-def recursive_jvmtime(i):
-    return get_jvm_exectime('RecursiveMath', { '$MATH_OP_1$': str(i), '$MATH_OP_2$': str(i), '$LOOPCOUNT$': '2000' })
+def recursive_jvmtime(i, j):
+    return get_jvm_exectime('RecursiveMath', { '$MATH_OP_1$': str(i), '$MATH_OP_2$': str(i), '$LOOPCOUNT$': str(j) })
 
 
-def qsort_jvmtime(i):
-    return get_jvm_exectime('QuickSort', { '$QSORT_INPUT_ARRAY$': gen_random_array(i), '$QSORT_INPUT_LEN$': str(i - 1), '$LOOPCOUNT$': '2000' })
+def qsort_jvmtime(i, j):
+    return get_jvm_exectime('QuickSort', { '$QSORT_INPUT_ARRAY$': gen_random_array(i), '$QSORT_INPUT_LEN$': str(i - 1), '$LOOPCOUNT$': str(j) })
 
 
 def test_jvmtime():
-    return get_jvm_exectime('Test', { })
+    return get_jvm_exectime('BaselineTest', { })
 
 
 random.seed(1)
@@ -93,21 +85,17 @@ csvoutput.append('program;input;exectime\n')
 
 baseline = test_jvmtime()
 
-for i in intrev:
-    csvoutput.append('{};{};{}\n'.format('IntReverse', i, intrev_jvmtime(i) - baseline))
-    test_jvmtime()
-for i in sieve:
-    csvoutput.append('{};{};{}\n'.format('PrimeSieve', i, sieve_jvmtime(i) - baseline))
-    test_jvmtime()
-for i in towers:
-    csvoutput.append('{};{};{}\n'.format('TowersOfHanoi', i, towers_jvmtime(i) - baseline))
-    test_jvmtime()
-for i in recursive:
-    csvoutput.append('{};{};{}\n'.format('RecursiveMath', i, recursive_jvmtime(i) - baseline))
-    test_jvmtime()
-for i in qsort:
-    csvoutput.append('{};{};{}\n'.format('QuickSort', i, qsort_jvmtime(i) - baseline))
-    test_jvmtime()
+for j in [1000, 2000, 3000, 4000, 5000]:
+    for i in intrev:
+        csvoutput.append('{};{};{};{}\n'.format('IntReverse', i, j, intrev_jvmtime(i, j)))
+    for i in sieve:
+        csvoutput.append('{};{};{};{}\n'.format('PrimeSieve', i, j, sieve_jvmtime(i, j)))
+    for i in towers:
+        csvoutput.append('{};{};{};{}\n'.format('TowersOfHanoi', i, j, towers_jvmtime(i, j)))
+    for i in recursive:
+        csvoutput.append('{};{};{};{}\n'.format('RecursiveMath', i, j, recursive_jvmtime(i, j)))
+    for i in qsort:
+        csvoutput.append('{};{};{};{}\n'.format('QuickSort', i, j, qsort_jvmtime(i, j)))
 
 csvoutput.append('{};{};{}\n'.format('Test', 0, baseline))
 
